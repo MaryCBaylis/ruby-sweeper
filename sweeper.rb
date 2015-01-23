@@ -11,18 +11,30 @@ class Board #begin with only a 5x5 board as an option to test other functions
     @game_board = Array.new(@vertical) {Array(@horizontal.times.map{" "})}
     @display_board = Array.new(@vertical) {Array(@horizontal.times.map{"0"})}
     generate_mines
+    return self.show_board
   end
 
   def show_board
     @vertical.times do |i| 
-      @horizontal.times {|j| print @display_board[i][j].to_s.center(3)} 
+      print ("y#{@vertical-i} |").to_s.center(3)
+      @horizontal.times {|j| print @display_board[@vertical-i-1][j].to_s.center(3)} 
       puts "\n" 
     end
-    # puts
+    print "-".center(4)
+    @horizontal.times {|j| print "-".to_s.center(3)} 
+    puts "\n" 
+    print "0".center(4)
+    @horizontal.times {|j| print "x#{j+1}".to_s.center(3)} 
+    puts "\n" 
+    # uncomment below if you need to see the actual gameboard
     # @vertical.times do |i| 
-    #   @horizontal.times {|j| print @game_board[i][j].to_s.center(3)} 
+    #   print (@vertical-i).to_s.center(3)
+    #   @horizontal.times {|j| print @game_board[@vertical-i-1][j].to_s.center(3)} 
     #   puts "\n" 
     # end
+    # print "0".center(3)
+    # @horizontal.times {|j| print (j+1).to_s.center(3)} 
+    # puts "\n" 
   end
 
   def question_cell(x,y)
@@ -70,20 +82,28 @@ class Board #begin with only a 5x5 board as an option to test other functions
         display_num != 0 ? @display_board[y-1][x-1] = display_num : @display_board[y-1][x-1]  = "."
         @game_board[y-1][x-1]  = "c"
         self.show_board
+        self.win_check
       end
     end
   end
 
   def win_check
-    cell_count = 0
-    @vertical.times do |i| 
-      @horizontal.times {|j| @game_board[i-1][j-1] == " " ? cell_count += 1 : cell_count }
-    end
-    if cell_count > 0
-      puts "You have #{cell_count} more cells to sweep!"
+    case @finished
+    when :true
+      puts "You already won this game!"
+    when :dead
+      puts "Sorry, you're already dead. That sucks."
     else
-      puts "You won the game, congratulations!"
-      @finished = :true
+      cell_count = 0
+      @vertical.times do |i| 
+        @horizontal.times {|j| @game_board[i-1][j-1] == " " ? cell_count += 1 : cell_count }
+      end
+      if cell_count > 0
+        puts "You have #{cell_count} more cells to sweep!"
+      else
+        puts "You won the game, congratulations!"
+        @finished = :true
+      end
     end
   end
   
@@ -108,8 +128,4 @@ class Board #begin with only a 5x5 board as an option to test other functions
 end
 
 game1 = Board.new
-# game1.generate_mines
-# game1.show_board
-game1.sweep_cell(2,4)
-game1.win_check
 binding.pry
