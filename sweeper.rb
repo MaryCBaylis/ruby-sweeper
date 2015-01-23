@@ -13,17 +13,6 @@ class Board #begin with only a 5x5 board as an option to test other functions
     generate_mines
   end
 
-  def generate_mines #private!
-    mines = 0
-    while mines < @total_mines do
-      samp_ver, samp_hor = (rand(1..@vertical)-1), (rand(1..@horizontal) - 1)
-      if @game_board[samp_ver][samp_hor] != "!" 
-        @game_board[samp_ver][samp_hor] = "!" 
-        mines += 1
-      end
-    end
-  end
-
   def show_board
     @vertical.times do |i| 
       @horizontal.times {|j| print @display_board[i][j].to_s.center(3)} 
@@ -97,12 +86,25 @@ class Board #begin with only a 5x5 board as an option to test other functions
       @finished = :true
     end
   end
+  
+  private
+  
+  def generate_mines #private!
+    mines = 0
+    while mines < @total_mines do
+      samp_ver, samp_hor = (rand(1..@vertical)-1), (rand(1..@horizontal) - 1)
+      if @game_board[samp_ver][samp_hor] != "!" 
+        @game_board[samp_ver][samp_hor] = "!" 
+        mines += 1
+      end
+    end
+  end
 
   def end_game #private!
     @finished = :dead
     puts "I'm sorry but you've swept land with a mine on it.\nNow you are dead.\n\nGame over."
   end
-  private :end_game, :generate_mines
+
 end
 
 game1 = Board.new
