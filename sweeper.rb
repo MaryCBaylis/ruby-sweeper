@@ -1,17 +1,35 @@
 # Main game file!
 require 'pry'
 
+# handles all incoming user input and output.
+#
+class Game
+  def initialize
+    @make_board = Hash.new {
+    horizontal: 5,
+    vertical: 5,
+    total_mines: 3
+    }
+    @game_board = Board.new(@make_board)
+    show
+  end
+
+  def show
+    @game_board.show_board
+  end
+end
+
+
 class Board #begin with only a 5x5 board as an option to test other functions
 
-  def initialize 
-    @horizontal = 5
-    @vertical = 5
-    @total_mines = 3
+  def initialize(board_spec)
+    @horizontal = board_spec[:horizontal]
+    @vertical = board_spec[:vertical]
+    @total_mines = board_spec[:total_mines]
     @finished = :false #false, true, dead all symbols!
     @game_board = Array.new(@vertical) {Array(@horizontal.times.map{" "})}
-    @display_board = Array.new(@vertical) {Array(@horizontal.times.map{"0"})}
+    # @display_board = Array.new(@vertical) {Array(@horizontal.times.map{"0"})}
     generate_mines
-    return self.show_board
   end
 
   def show_board
@@ -25,16 +43,7 @@ class Board #begin with only a 5x5 board as an option to test other functions
     puts "\n" 
     print "0".center(4)
     @horizontal.times {|j| print "x#{j+1}".to_s.center(3)} 
-    puts "\n" 
-    # uncomment below if you need to see the actual gameboard
-    # @vertical.times do |i| 
-    #   print (@vertical-i).to_s.center(3)
-    #   @horizontal.times {|j| print @game_board[@vertical-i-1][j].to_s.center(3)} 
-    #   puts "\n" 
-    # end
-    # print "0".center(3)
-    # @horizontal.times {|j| print (j+1).to_s.center(3)} 
-    # puts "\n" 
+    puts "\n"
   end
 
   def question_cell(x,y)
