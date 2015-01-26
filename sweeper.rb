@@ -1,17 +1,34 @@
 # Main game file!
 require 'pry'
 
-class Board
-  # begin with only a 5x5 board as an option to test other functions
+# handles all incoming user input and output.
+#
+class Game
   def initialize
-    @horizontal = 5
-    @vertical = 5
-    @total_mines = 3
-    @finished = :false # false, true, dead all symbols!
-    @game_board = Array.new(@vertical) { Array(@horizontal.times.map { ' ' }) }
-    @display_board = Array.new(@vertical) { Array(@horizontal.times.map { '0' }) }
+    @make_board = Hash.new {
+    horizontal: 5,
+    vertical: 5,
+    total_mines: 3
+    }
+    @game_board = Board.new(@make_board)
+    show
+  end
+
+  def show
+    @game_board.show_board
+  end
+end
+
+class Board #begin with only a 5x5 board as an option to test other functions
+
+  def initialize(board_spec)
+    @horizontal = board_spec[:horizontal]
+    @vertical = board_spec[:vertical]
+    @total_mines = board_spec[:total_mines]
+    @finished = :false #false, true, dead all symbols!
+    @game_board = Array.new(@vertical) {Array(@horizontal.times.map{" "})}
+    # @display_board = Array.new(@vertical) {Array(@horizontal.times.map{"0"})}
     generate_mines
-    show_board
   end
 
   def show_board
