@@ -75,11 +75,6 @@ class Cell
     @display = :question
     calc_presentation
   end
-
-  # def oversweep
-  #   @display = :true
-  #   calc_presentation
-  # end
 end
 
 # This is the bomb factory!
@@ -161,22 +156,20 @@ class Board
   end
 
   def oversweep(x, y)
-    # if get_obj_by_coord(x, y).display == :false
-      [(y - 1), y, (y + 1)].each do |i|
-        [(x - 1), x, (x + 1)].each do |j|
-          if [x, y] != [j, i]
-            if in_bounds(j, i)
-              if get_obj_by_coord(j, i).danger_lvl == 0 && get_obj_by_coord(j, i).swept == :false
-                get_obj_by_coord(j, i).sweep
-                oversweep(j, i)
-              else
-                get_obj_by_coord(j, i).sweep
-              end
-            end # bounds
-          end
+    [(y - 1), y, (y + 1)].each do |i|
+      [(x - 1), x, (x + 1)].each do |j|
+        if [x, y] != [j, i]
+          if in_bounds(j, i)
+            if get_obj_by_coord(j, i).danger_lvl == 0 && get_obj_by_coord(j, i).swept == :false
+              get_obj_by_coord(j, i).sweep
+              oversweep(j, i)
+            else
+              get_obj_by_coord(j, i).sweep
+            end
+          end # bounds
         end
       end
-    # end
+    end
   end
 
   def get_obj_by_coord(x,y)
@@ -194,7 +187,7 @@ class Board
     result[:total] = @horizontal * @vertical
     result[:remaining] = 0
     @vertical.times do |i|
-      @horizontal.times do |j| 
+      @horizontal.times do |j|
         @board[i -1][j - 1].class == Mine ? result[:remaining] += 1 : result[:remaining] 
       end
     end
