@@ -7,7 +7,7 @@ class Game
   attr_reader :game_status, :game_board
 
   def initialize(x,y)
-    @make_board = { horizontal: x, vertical: y, total_mines: (x * y / 9) }
+    @make_board = { horizontal: x, vertical: y, total_mines: (x * y / 8) }
     @game_board = Board.new(@make_board)
     @game_status = :playing # also :loss and :victory
     show
@@ -22,7 +22,10 @@ class Game
   end
 
   def sweep(x,y)
-    @game_board.get_obj_by_coord(x,y).sweep
+    if @game_board.get_obj_by_coord(x-1,y-1).danger_lvl == 0
+      @game_board.oversweep(x-1,y-1)
+    end
+    @game_board.get_obj_by_coord(x-1,y-1).sweep
     show
   end
 
@@ -35,8 +38,10 @@ end
 # This will fill the board array; each is auto-populated.
 #
 class Cell
+  attr_reader :danger_lvl, :display, :swept
   def initialize(data)
     @display = :false
+    @swept = :false
     @coord = [data[:x],data[:y]]
     @danger_lvl = data[:danger]
     calc_presentation
@@ -62,6 +67,7 @@ class Cell
 
   def sweep
     @display = :true
+    @swept = :true
     calc_presentation
   end
 
@@ -70,10 +76,10 @@ class Cell
     calc_presentation
   end
 
-  def oversweep
-    @display = :true
-    calc_presentation
-  end
+  # def oversweep
+  #   @display = :true
+  #   calc_presentation
+  # end
 end
 
 # This is the bomb factory!
@@ -90,8 +96,8 @@ end
 # begin with only a 5x5 board as an option to test other functions
 #
 class Board
-  attr_reader :total_mines, :horizontal, :vertical
-
+  $help = []
+  attr_reader :total_mines, :horizontal, :vertical, :board
   def initialize(board_spec)
     @horizontal = board_spec[:horizontal]
     @vertical = board_spec[:vertical]
@@ -112,11 +118,11 @@ class Board
 
   def generate_cells
     @board.size.times do |i|
-      @board[i - 1].size.times do |j| 
-        @board[i - 1][j - 1] ||= Cell.new( {
-          :x => j - 1,
-          :y => i - 1,
-          :danger => find_danger(j - 1, i - 1)
+      @board[i].size.times do |j| 
+        @board[i][j] ||= Cell.new( {
+          :x => j,
+          :y => i,
+          :danger => find_danger(j, i)
           } )
       end
     end
@@ -126,8 +132,8 @@ class Board
     danger = 0
     [(y - 1), y, (y + 1)].each do |i|
       [(x - 1), x, (x + 1)].each do |j|
-        if in_bounds(j,i)
-          danger += 1 if get_obj_by_coord(j,i).class == Mine
+        if in_bounds(j, i)
+          danger += 1 if get_obj_by_coord(j, i).class == Mine
         end
       end
     end
@@ -154,8 +160,27 @@ class Board
     puts "\n"
   end
 
+  def oversweep(x, y)
+    # if get_obj_by_coord(x, y).display == :false
+      [(y - 1), y, (y + 1)].each do |i|
+        [(x - 1), x, (x + 1)].each do |j|
+          if [x, y] != [j, i]
+            if in_bounds(j, i)
+              if get_obj_by_coord(j, i).danger_lvl == 0 && get_obj_by_coord(j, i).swept == :false
+                get_obj_by_coord(j, i).sweep
+                oversweep(j, i)
+              else
+                get_obj_by_coord(j, i).sweep
+              end
+            end # bounds
+          end
+        end
+      end
+    # end
+  end
+
   def get_obj_by_coord(x,y)
-    return @board[y-1][x-1]
+    return @board[y][x]
   end
 
   def lose_game
@@ -203,6 +228,7 @@ class Board
 end
 
 game1 = Game.new(30,30)
-# binding.pry
 puts
-game1.lose
+# print $help
+# game1.lose
+binding.pry
