@@ -47,7 +47,7 @@ class Cell
       case @display
       when :true 
         case @danger_lvl
-        when 0 then "."
+        when 0 then " "
         when :mine then "X"
         else @danger_lvl
         end
@@ -112,11 +112,11 @@ class Board
 
   def generate_cells
     @board.size.times do |i|
-      @board[i].size.times do |j| 
-        @board[i-1][j-1] ||= Cell.new( {
-          :x => j-1,
-          :y => i-1,
-          :danger => find_danger(j, i)
+      @board[i - 1].size.times do |j| 
+        @board[i - 1][j - 1] ||= Cell.new( {
+          :x => j - 1,
+          :y => i - 1,
+          :danger => find_danger(j - 1, i - 1)
           } )
       end
     end
@@ -140,16 +140,16 @@ class Board
 
   def show_board
     @vertical.times do |i|
-      print "y#{@vertical - i} |".center(3)
+      print "y#{@vertical - i} |".center(5)
       @horizontal.times do |j| 
         print @board[@vertical - i - 1][j].present
       end
       puts "\n"
     end
-    print '-'.center(4)
-    @horizontal.times { print '-'.to_s.center(3) }
+    print '-'.center(5)
+    @horizontal.times { print '---'.to_s.center(3) }
     puts "\n"
-    print '0'.center(4)
+    print '0'.center(5)
     @horizontal.times { |j| print "x#{j + 1}".center(3) }
     puts "\n"
   end
@@ -170,54 +170,10 @@ class Board
     result[:remaining] = 0
     @vertical.times do |i|
       @horizontal.times do |j| 
-        @board[i][j].class == Mine ? result[:remaining] += 1 : result[:remaining] 
+        @board[i -1][j - 1].class == Mine ? result[:remaining] += 1 : result[:remaining] 
       end
     end
   end
-  # def sweep_cell(x, y)
-  #   case @finished
-  #   when :true
-  #     puts 'You already won this game!'
-  #   when :dead
-  #     puts "Sorry, you're already dead. That sucks."
-  #   else
-  #     if @game_board[y - 1][x - 1] == '!'
-  #       @display_board[y - 1][x - 1] = '!'
-  #       end_game
-  #     else
-  #       display_num = 0
-  #       if y - 2 >= 0
-  #         if x - 2 >= 0
-  #           @game_board[y - 2][x - 2] == '!' ? display_num += 1 : display_num
-  #         end
-  #         @game_board[y - 2][x - 1] == '!' ? display_num += 1 : display_num
-  #         if x == !@horizontal
-  #           @game_board[y - 2][x] == '!' ? display_num += 1 : display_num
-  #         end
-  #       end
-  #       if x - 2 >= 0
-  #         @game_board[y - 1][x - 2] == '!' ? display_num += 1 : display_num
-  #       end
-  #       @game_board[y - 1][x - 1] == '!' ? display_num += 1 : display_num
-  #       if x == !@horizontal
-  #         @game_board[y - 1][x] == '!' ? display_num += 1 : display_num
-  #       end
-  #       if y == !@vertical
-  #         if x - 2 != 0
-  #           @game_board[y][x - 2] == '!' ? display_num += 1 : display_num
-  #         end
-  #         @game_board[y][x - 1] == '!' ? display_num += 1 : display_num
-  #         if x == !@horizontal
-  #           @game_board[y][x] == '!' ? display_num += 1 : display_num
-  #         end
-  #       end
-  #       display_num != 0 ? @display_board[y - 1][x - 1] = display_num : @display_board[y - 1][x - 1]  = '.'
-  #       @game_board[y - 1][x - 1]  = 'c'
-  #       show_board
-  #       win_check
-  #     end
-  #   end
-  # end
 
   # def win_check
   #   case @finished
@@ -246,7 +202,7 @@ class Board
   # end
 end
 
-game1 = Game.new(10,10)
+game1 = Game.new(30,30)
 # binding.pry
 puts
 game1.lose
