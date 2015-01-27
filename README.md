@@ -40,4 +40,7 @@ To win, you need to sweep every non-mine cell on the board. Sweeping any cell wi
 
 ## Legal
 
-Hahahahahaha good joke. Designed in pure experiment by Chris Singer, @tremulaes on twitter.
+Hahahahahaha good joke. Designed in pure experiment by: 
+
+Chris Singer: @tremulaes (twitter), secade (Github)
+Mary Baylis: @MCBaylis (twitter), MaryCBaylis(Github)
