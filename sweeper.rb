@@ -7,9 +7,9 @@ class Game
   attr_reader :game_status, :game_board
 
   def initialize(x,y)
-    @make_board = { horizontal: x, vertical: y, total_mines: (x * y / 8) }
+    @make_board = { horizontal: x, vertical: y, total_mines: 6 } # (x * y / 8) }
     @game_board = Board.new(@make_board)
-    @game_status = :playing # also :loss and :victory
+    @game_status = :continue # also :loss and :victory
     show
   end
 
@@ -18,19 +18,45 @@ class Game
   end
 
   def win_check
+    check = @game_board.count_cells
+    if check[:remaining] == 0 && game_status != :loss
+      @game_status = :victory
+    end
+    status_check(check[:remaining])
+  end
 
+  def status_check(remaining)
+    case @game_status
+    when :victory 
+      puts "Congratulations you've won this game!"
+      return :stop
+    when :loss 
+      puts "This game was LOST sucka"
+      return :stop
+    else
+      puts "You have #{remaining} cells to go."
+      return :continue
+    end
   end
 
   def sweep(x,y)
-    if @game_board.get_obj_by_coord(x-1,y-1).danger_lvl == 0
-      @game_board.oversweep(x-1,y-1)
+    if @game_status == :continue
+      if @game_board.get_obj_by_coord(x-1,y-1).danger_lvl == :mine
+        lose
+      else
+        if @game_board.get_obj_by_coord(x-1,y-1).danger_lvl == 0
+          @game_board.oversweep(x-1,y-1)
+        end
+        @game_board.get_obj_by_coord(x-1,y-1).sweep
+        show
+      end
     end
-    @game_board.get_obj_by_coord(x-1,y-1).sweep
-    show
+    win_check
   end
 
   def lose
-    @game_board.lose_game
+    @game_status = :loss
+    @game_board.reveal_board
     show
   end
 end
@@ -57,7 +83,7 @@ class Cell
         else @danger_lvl
         end
       when :question then "?"
-      when :false then "0"
+      when :false then "-"
       end
   end
 
@@ -69,6 +95,7 @@ class Cell
     @display = :true
     @swept = :true
     calc_presentation
+    return @danger_lvl
   end
 
   def mark
@@ -176,21 +203,24 @@ class Board
     return @board[y][x]
   end
 
-  def lose_game
+  def reveal_board
     @vertical.times do |i|
       @horizontal.times { |j| @board[i][j].sweep }
     end
-    @game_status = :loss
   end
   
   def count_cells
+    result = {}
     result[:total] = @horizontal * @vertical
     result[:remaining] = 0
     @vertical.times do |i|
       @horizontal.times do |j|
-        @board[i -1][j - 1].class == Mine ? result[:remaining] += 1 : result[:remaining] 
+        if @board[i -1][j - 1].class != Mine && @board[i -1][j - 1].display == :false
+          result[:remaining] += 1 #unless @board[i -1][j - 1].class == Mine
+        end
       end
     end
+    result
   end
 
   # def win_check
@@ -220,7 +250,7 @@ class Board
   # end
 end
 
-game1 = Game.new(30,30)
+g = Game.new(30,30)
 puts
 # print $help
 # game1.lose
