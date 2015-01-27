@@ -4,7 +4,7 @@ require 'pry'
 # handles all incoming user input and output.
 #
 class Game
-  attr_reader :game_status
+  attr_reader :game_status, :game_board
 
   def initialize(x,y)
     @make_board = { horizontal: x, vertical: y, total_mines: (x * y / 9) }
@@ -35,17 +35,11 @@ end
 # This will fill the board array; each is auto-populated.
 #
 class Cell
-  def initialize(coord)
+  def initialize(data)
     @display = :false
-    @coord = [coord[:x],coord[:y]]
-    @danger_lvl = find_danger # 0-8 symbols, or mine for Mine class
+    @coord = [data[:x],data[:y]]
+    @danger_lvl = data[:danger]
     calc_presentation
-  end
-
-  def find_danger
-    # if coord[0] < 
-
-    return 0
   end
 
   def calc_presentation
@@ -96,13 +90,13 @@ end
 # begin with only a 5x5 board as an option to test other functions
 #
 class Board
-  attr_reader :total_mines
+  attr_reader :total_mines, :horizontal, :vertical
 
   def initialize(board_spec)
     @horizontal = board_spec[:horizontal]
     @vertical = board_spec[:vertical]
     @total_mines = board_spec[:total_mines]
-    @game_board = Array.new(@vertical) {Array.new(@horizontal,nil)}
+    @board = Array.new(@vertical) {Array.new(@horizontal, nil)}
     generate_mines
     generate_cells
   end
@@ -113,22 +107,42 @@ class Board
       ver, hor = (rand(1..@vertical) - 1), (rand(1..@horizontal) - 1)
       !mines.include?([ver,hor]) ? mines << [ver,hor] : mines
     end
-    mines.each { |i| @game_board[i[0]][i[1]] = Mine.new({:x => i[1],:y => i[0]}) }
+    mines.each { |i| @board[i[0]][i[1]] = Mine.new({ :x => i[1], :y => i[0]}) }
   end
 
   def generate_cells
-    @game_board.size.times do |i|
-      @game_board[i].size.times do |j| 
-        @game_board[i][j] ||= Cell.new({:x => j,:y => i})
+    @board.size.times do |i|
+      @board[i].size.times do |j| 
+        @board[i-1][j-1] ||= Cell.new( {
+          :x => j-1,
+          :y => i-1,
+          :danger => find_danger(j, i)
+          } )
       end
     end
+  end
+
+  def find_danger(x, y)
+    danger = 0
+    [(y - 1), y, (y + 1)].each do |i|
+      [(x - 1), x, (x + 1)].each do |j|
+        if in_bounds(j,i)
+          danger += 1 if get_obj_by_coord(j,i).class == Mine
+        end
+      end
+    end
+    danger
+  end
+
+  def in_bounds(x,y)
+    x >= 0 && x < @horizontal && y >= 0 && y < @vertical
   end
 
   def show_board
     @vertical.times do |i|
       print "y#{@vertical - i} |".center(3)
       @horizontal.times do |j| 
-        print @game_board[@vertical - i - 1][j].present
+        print @board[@vertical - i - 1][j].present
       end
       puts "\n"
     end
@@ -141,12 +155,12 @@ class Board
   end
 
   def get_obj_by_coord(x,y)
-    return @game_board[y-1][x-1]
+    return @board[y-1][x-1]
   end
 
   def lose_game
     @vertical.times do |i|
-      @horizontal.times { |j| @game_board[i][j].sweep }
+      @horizontal.times { |j| @board[i][j].sweep }
     end
     @game_status = :loss
   end
@@ -156,7 +170,7 @@ class Board
     result[:remaining] = 0
     @vertical.times do |i|
       @horizontal.times do |j| 
-        @game_board[i][j].class == Mine ? result[:remaining] += 1 : result[:remaining] 
+        @board[i][j].class == Mine ? result[:remaining] += 1 : result[:remaining] 
       end
     end
   end
@@ -233,6 +247,6 @@ class Board
 end
 
 game1 = Game.new(10,10)
+# binding.pry
 puts
 game1.lose
-# binding.pry
