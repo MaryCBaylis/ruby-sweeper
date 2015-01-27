@@ -35,32 +35,31 @@ end
 # This will fill the board array; each is auto-populated.
 #
 class Cell
-  def initialize(ver,hor)
+  def initialize(coord)
     @display = :false
-    @danger_lvl = find_danger(@ver,@hor) # 0-8 symbols, or mine for Mine class
+    @coord = [coord[:x],coord[:y]]
+    @danger_lvl = find_danger # 0-8 symbols, or mine for Mine class
     calc_presentation
   end
 
-  def find_danger(ver,hor)
+  def find_danger
+    # if coord[0] < 
+
     return 0
   end
 
   def calc_presentation
-    case @display
-    when :true 
-      case @danger_lvl
-      when 0
-        @display_val = "."
-      when :mine
-        @display_val = "X"
-      else
-        @display_val = @danger_lvl
+    @display_val = 
+      case @display
+      when :true 
+        case @danger_lvl
+        when 0 then "."
+        when :mine then "X"
+        else @danger_lvl
+        end
+      when :question then "?"
+      when :false then "0"
       end
-    when :question
-      @display_val = "?"
-    when :false
-      @display_val = "0"
-    end
   end
 
   def present
@@ -78,7 +77,6 @@ class Cell
   end
 
   def oversweep
-    # what happens when board games oversweep on this cell
     @display = :true
     calc_presentation
   end
@@ -87,14 +85,17 @@ end
 # This is the bomb factory!
 #
 class Mine < Cell
-  def initialize
+  def initialize(coord)
+    @coord = [coord[:x],coord[:y]]
     @display = :false
     @danger_lvl = :mine
     calc_presentation
   end
 end
 
-class Board #begin with only a 5x5 board as an option to test other functions
+# begin with only a 5x5 board as an option to test other functions
+#
+class Board
 
   def initialize(board_spec)
     @horizontal = board_spec[:horizontal]
@@ -111,13 +112,13 @@ class Board #begin with only a 5x5 board as an option to test other functions
       ver, hor = (rand(1..@vertical) - 1), (rand(1..@horizontal) - 1)
       !mines.include?([ver,hor]) ? mines << [ver,hor] : mines
     end
-    mines.each { |i| @game_board[i[0]][i[1]] = Mine.new }
+    mines.each { |i| @game_board[i[0]][i[1]] = Mine.new({:x => i[1],:y => i[0]}) }
   end
 
   def generate_cells
     @game_board.size.times do |i|
       @game_board[i].size.times do |j| 
-        @game_board[i][j] ||= Cell.new(@vertical,@horizontal)
+        @game_board[i][j] ||= Cell.new({:x => j,:y => i})
       end
     end
   end
@@ -222,4 +223,6 @@ class Board #begin with only a 5x5 board as an option to test other functions
 end
 
 game1 = Game.new
-binding.pry
+puts
+game1.lose
+# binding.pry
