@@ -6,8 +6,8 @@ require 'pry'
 class Game
   attr_reader :game_status
 
-  def initialize
-    @make_board = { horizontal: 5, vertical: 5, total_mines: 3 }
+  def initialize(x,y)
+    @make_board = { horizontal: x, vertical: y, total_mines: (x * y / 9) }
     @game_board = Board.new(@make_board)
     @game_status = :playing # also :loss and :victory
     show
@@ -18,7 +18,7 @@ class Game
   end
 
   def win_check
-    # before every player action, we check this first and stop action if lost
+
   end
 
   def sweep(x,y)
@@ -96,6 +96,7 @@ end
 # begin with only a 5x5 board as an option to test other functions
 #
 class Board
+  attr_reader :total_mines
 
   def initialize(board_spec)
     @horizontal = board_spec[:horizontal]
@@ -150,6 +151,15 @@ class Board
     @game_status = :loss
   end
   
+  def count_cells
+    result[:total] = @horizontal * @vertical
+    result[:remaining] = 0
+    @vertical.times do |i|
+      @horizontal.times do |j| 
+        @game_board[i][j].class == Mine ? result[:remaining] += 1 : result[:remaining] 
+      end
+    end
+  end
   # def sweep_cell(x, y)
   #   case @finished
   #   when :true
@@ -222,7 +232,7 @@ class Board
   # end
 end
 
-game1 = Game.new
+game1 = Game.new(10,10)
 puts
 game1.lose
 # binding.pry
