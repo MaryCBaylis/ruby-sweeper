@@ -4,14 +4,31 @@ require 'pry'
 # handles all incoming user input and output.
 #
 class Game
+  attr_reader :game_status
+
   def initialize
     @make_board = { horizontal: 5, vertical: 5, total_mines: 3 }
     @game_board = Board.new(@make_board)
+    @game_status = :playing # also :loss and :victory
     show
   end
 
   def show
     @game_board.show_board
+  end
+
+  def win_check
+    # before every player action, we check this first and stop action if lost
+  end
+
+  def sweep(x,y)
+    @game_board.get_obj_by_coord(x,y).sweep
+    show
+  end
+
+  def lose
+    @game_board.lose_game
+    show
   end
 end
 
@@ -20,28 +37,60 @@ end
 class Cell
   def initialize(ver,hor)
     @display = :false
-    @danger_lvl = find_danger(@ver,@hor)
+    @danger_lvl = find_danger(@ver,@hor) # 0-8 symbols, or mine for Mine class
+    calc_presentation
   end
 
   def find_danger(ver,hor)
     return 0
   end
 
-  def present
-    if @display 
-      print @danger_lvl.to_s.center(3)
-    else 
-      print "X".to_s.center(3)
+  def calc_presentation
+    case @display
+    when :true 
+      case @danger_lvl
+      when 0
+        @display_val = "."
+      when :mine
+        @display_val = "X"
+      else
+        @display_val = @danger_lvl
+      end
+    when :question
+      @display_val = "?"
+    when :false
+      @display_val = "0"
     end
+  end
+
+  def present
+    print @display_val.to_s.center(3)
+  end
+
+  def sweep
+    @display = :true
+    calc_presentation
+  end
+
+  def mark
+    @display = :question
+    calc_presentation
+  end
+
+  def oversweep
+    # what happens when board games oversweep on this cell
+    @display = :true
+    calc_presentation
   end
 end
 
-# This is the bome factory!
+# This is the bomb factory!
 #
 class Mine < Cell
   def initialize
     @display = :false
-    @danger_lvl = "X"
+    @danger_lvl = :mine
+    calc_presentation
   end
 end
 
@@ -74,28 +123,32 @@ class Board #begin with only a 5x5 board as an option to test other functions
   end
 
   def show_board
-    # binding.pry
     @vertical.times do |i|
-      # print "y#{@vertical - i} |".center(3)
+      print "y#{@vertical - i} |".center(3)
       @horizontal.times do |j| 
         print @game_board[@vertical - i - 1][j].present
-        # print "x".center(3)
       end
       puts "\n"
     end
-    # print '-'.center(4)
-    # @horizontal.times { print '-'.to_s.center(3) }
-    # puts "\n"
-    # print '0'.center(4)
-    # @horizontal.times { |j| print "x#{j + 1}".center(3) }
-    # puts "\n"
+    print '-'.center(4)
+    @horizontal.times { print '-'.to_s.center(3) }
+    puts "\n"
+    print '0'.center(4)
+    @horizontal.times { |j| print "x#{j + 1}".center(3) }
+    puts "\n"
   end
 
-  # def question_cell(x, y)
-  #   @display_board[y - 1][x - 1] = '?'
-  #   show_board
-  # end
+  def get_obj_by_coord(x,y)
+    return @game_board[y-1][x-1]
+  end
 
+  def lose_game
+    @vertical.times do |i|
+      @horizontal.times { |j| @game_board[i][j].sweep }
+    end
+    @game_status = :loss
+  end
+  
   # def sweep_cell(x, y)
   #   case @finished
   #   when :true
@@ -168,5 +221,5 @@ class Board #begin with only a 5x5 board as an option to test other functions
   # end
 end
 
-# binding.pry
 game1 = Game.new
+binding.pry
