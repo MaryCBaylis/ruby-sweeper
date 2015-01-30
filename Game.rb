@@ -57,3 +57,6 @@ class Game
     show
   end
 end
+
+# g = Game.new(30, 30)
+# puts
