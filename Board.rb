@@ -28,8 +28,6 @@ class Board
     puts "\n"
   end
 
-#TOP and RIGHT EDGE CALLS HAVE ISSUES
-#Top left calls wrap to the bottom right
 #10,5 overswept 5,10?
 #5,1 wraps to 1,5 The sweep is in the correct spot, but the oversweep is not<- where's the switch in coordinates?
 #bug seems to happen when entered coordinate dgr lvl is 0, but inverse coordinate is not
