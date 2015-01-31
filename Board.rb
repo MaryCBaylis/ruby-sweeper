@@ -32,6 +32,7 @@ class Board
 #5,1 overswept 1,5 The sweep is in the correct spot, but the oversweep is not<- where's the switch in coordinates?
 #2,7 swept 2,7, but overswept 7,2
 #bug seems to happen when inverse coord is not in the same overswept area as coord.  It appears oversweep is being called on the inverse each time, but changing the order of coordinates severely breaks oversweep
+#I switched the x and y coordinates in Game.rb's call to oversweep.  By all accounts it shouldn't have fixed it but it does.  Why?
   def oversweep(x, y)
     [(y - 1), y, (y + 1)].each do |i|
       [(x - 1), x, (x + 1)].each do |j|
