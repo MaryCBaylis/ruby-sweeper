@@ -11,14 +11,15 @@ class Cell
   def calc_presentation
     @display_val =
       case @display
-      when :true
-        case @danger_lvl
-        when 0 then ' '
-        when :mine then 'X'
-        else @danger_lvl
-        end
-      # when :question then '?'
-      when :false then '-'
+        when :true
+          case @danger_lvl
+            when 0 then ' '
+            when :mine then 'X'
+            else @danger_lvl
+          end
+        when :question then '?'
+        when :flag then "⚑"
+        when :false then '-'
       end
   end
 
@@ -33,8 +34,13 @@ class Cell
     @danger_lvl
   end
 
-  def mark
+  def question
     @display = :question
+    calc_presentation
+  end
+
+  def flag
+    @display = :flag
     calc_presentation
   end
 end

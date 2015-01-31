@@ -6,10 +6,10 @@ class Game
   attr_reader :game_status
 
   def initialize(x, y)
-    @make_board = { horizontal: x, vertical: y, total_mines: 6 } # (x * y / 8) }
+    @make_board = { horizontal: x, vertical: y, total_mines: x * y / 8 }
     @game_board = Board.new(@make_board)
     @game_status = :continue
-    show
+    #show
   end
 
   def show
@@ -45,7 +45,7 @@ class Game
           @game_board.oversweep(x - 1, y - 1)
         end
         @game_board.get_obj_by_coord(x - 1, y - 1).sweep
-        show
+        #show
       end
     end
     win_check
