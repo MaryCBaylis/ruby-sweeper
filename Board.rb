@@ -29,15 +29,15 @@ class Board
   end
 
 #10,5 overswept 5,10?
-#5,1 wraps to 1,5 The sweep is in the correct spot, but the oversweep is not<- where's the switch in coordinates?
-#bug seems to happen when entered coordinate dgr lvl is 0, but inverse coordinate is not
+#5,1 overswept 1,5 The sweep is in the correct spot, but the oversweep is not<- where's the switch in coordinates?
+#2,7 swept 2,7, but overswept 7,2
+#bug seems to happen when inverse coord is not in the same overswept area as coord.  It appears oversweep is being called on the inverse each time, but changing the order of coordinates severely breaks oversweep
   def oversweep(x, y)
     [(y - 1), y, (y + 1)].each do |i|
       [(x - 1), x, (x + 1)].each do |j|
         if [x, y] != [j, i]
           if in_bounds(j, i)
             if @board[j][i].danger_lvl == 0 && @board[j][i].swept == :false
-                          puts "#{j},#{i} has been swept, #{x},#{y} was origin"
               @board[j][i].sweep
               oversweep(j, i)
             else
