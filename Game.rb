@@ -42,9 +42,7 @@ class Game
         lose
       else
         if @game_board.get_obj_by_coord(x - 1, y - 1).danger_lvl == 0
-          #switched x and y here
-          #why does this fix it??
-          @game_board.oversweep(y - 1, x - 1)
+          @game_board.oversweep(x - 1, y - 1)
         end
         @game_board.get_obj_by_coord(x - 1, y - 1).sweep
         #show

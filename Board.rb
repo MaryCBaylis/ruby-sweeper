@@ -28,21 +28,16 @@ class Board
     puts "\n"
   end
 
-#10,5 overswept 5,10?
-#5,1 overswept 1,5 The sweep is in the correct spot, but the oversweep is not<- where's the switch in coordinates?
-#2,7 swept 2,7, but overswept 7,2
-#bug seems to happen when inverse coord is not in the same overswept area as coord.  It appears oversweep is being called on the inverse each time, but changing the order of coordinates severely breaks oversweep
-#I switched the x and y coordinates in Game.rb's call to oversweep.  By all accounts it shouldn't have fixed it but it does.  Why?
   def oversweep(x, y)
     [(y - 1), y, (y + 1)].each do |i|
       [(x - 1), x, (x + 1)].each do |j|
         if [x, y] != [j, i]
           if in_bounds(j, i)
-            if @board[j][i].danger_lvl == 0 && @board[j][i].swept == :false
-              @board[j][i].sweep
+            if @board[i][j].danger_lvl == 0 && @board[i][j].swept == :false
+              @board[i][j].sweep
               oversweep(j, i)
             else
-              @board[j][i].sweep
+              @board[i][j].sweep
             end
           end # bounds
         end
