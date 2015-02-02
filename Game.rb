@@ -48,6 +48,20 @@ class Game
     win_check
   end
 
+  def flag(x, y)
+    if @game_status == :continue
+      @game_board.get_obj_by_coord(x-1, y-1).flag
+    end
+    win_check
+  end
+
+  def question(x, y)
+    if @game_status == :continue
+      @game_board.get_obj_by_coord(x-1, y-1).question
+    end
+    win_check
+  end
+
   def lose
     @game_status = :loss
     @game_board.reveal_board
